@@ -24,6 +24,8 @@ public class StationRepository {
                         list.add(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findByOperator", e);
             }
             return list;
         });
@@ -39,6 +41,8 @@ public class StationRepository {
                         list.add(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findByWorld", e);
             }
             return list;
         });
@@ -53,6 +57,8 @@ public class StationRepository {
                         return Optional.of(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findById", e);
             }
             return Optional.empty();
         });
@@ -78,6 +84,8 @@ public class StationRepository {
                         return keys.getInt(1);
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing create", e);
             }
             return -1;
         });
@@ -89,6 +97,8 @@ public class StationRepository {
                 ps.setInt(1, broken ? 1 : 0);
                 ps.setInt(2, id);
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing setBroken", e);
             }
             return null;
         });
@@ -100,6 +110,8 @@ public class StationRepository {
                 ps.setInt(1, level);
                 ps.setInt(2, id);
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing setLevel", e);
             }
             return null;
         });
@@ -110,6 +122,8 @@ public class StationRepository {
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM stations WHERE id = ?")) {
                 ps.setInt(1, id);
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing delete", e);
             }
             return null;
         });
@@ -120,6 +134,8 @@ public class StationRepository {
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM stations WHERE operator_id = ?")) {
                 ps.setString(1, operatorId.toLowerCase(Locale.ROOT));
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing deleteByOperator", e);
             }
             return null;
         });
