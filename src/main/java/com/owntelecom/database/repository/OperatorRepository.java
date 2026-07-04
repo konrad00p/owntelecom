@@ -23,6 +23,8 @@ public class OperatorRepository {
                         return Optional.of(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findById", e);
             }
             return Optional.empty();
         });
@@ -38,6 +40,8 @@ public class OperatorRepository {
                         list.add(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findByOwner", e);
             }
             return list;
         });
@@ -51,6 +55,8 @@ public class OperatorRepository {
                 while (rs.next()) {
                     list.add(map(rs));
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findAll", e);
             }
             return list;
         });
@@ -70,6 +76,8 @@ public class OperatorRepository {
                 ps.setDouble(8, operator.prepaidMb());
                 ps.setInt(9, operator.passCostToClient() ? 1 : 0);
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing create", e);
             }
             return null;
         });
@@ -80,6 +88,8 @@ public class OperatorRepository {
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM operators WHERE id = ?")) {
                 ps.setString(1, id.toLowerCase(Locale.ROOT));
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing delete", e);
             }
             return null;
         });
@@ -91,6 +101,8 @@ public class OperatorRepository {
                 ps.setString(1, newOwner.toString());
                 ps.setString(2, id.toLowerCase(Locale.ROOT));
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing updateOwner", e);
             }
             return null;
         });
@@ -102,6 +114,8 @@ public class OperatorRepository {
                 ps.setString(1, displayName);
                 ps.setString(2, id.toLowerCase(Locale.ROOT));
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing updateDisplayName", e);
             }
             return null;
         });
@@ -116,6 +130,8 @@ public class OperatorRepository {
                 ps.setDouble(3, mb);
                 ps.setString(4, id.toLowerCase(Locale.ROOT));
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing updatePrepaidRates", e);
             }
             return null;
         });
