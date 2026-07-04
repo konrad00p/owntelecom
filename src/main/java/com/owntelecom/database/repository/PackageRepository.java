@@ -85,7 +85,7 @@ public class PackageRepository {
                 rs.getDouble("minutes"),
                 rs.getDouble("sms"),
                 rs.getDouble("mb"),
-                rs.setInt("duration_days"),
+                rs.getInt("duration_days"),
                 rs.getString("zone_id")
         );
     }
