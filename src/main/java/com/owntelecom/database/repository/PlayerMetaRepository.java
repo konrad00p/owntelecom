@@ -16,31 +16,39 @@ public class PlayerMetaRepository {
 
     public PlayerMeta getOrCreate(UUID playerUuid) {
         return db.runSync(conn -> {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM player_meta WHERE player_uuid = ?")) {
-                ps.setString(1, playerUuid.toString());
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return map(rs);
+            try {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM player_meta WHERE player_uuid = ?")) {
+                    ps.setString(1, playerUuid.toString());
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            return map(rs);
+                        }
                     }
                 }
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "INSERT INTO player_meta (player_uuid) VALUES (?)")) {
+                    ps.setString(1, playerUuid.toString());
+                    ps.executeUpdate();
+                }
+                return new PlayerMeta(playerUuid, 0, false);
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing getOrCreate", e);
             }
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO player_meta (player_uuid) VALUES (?)")) {
-                ps.setString(1, playerUuid.toString());
-                ps.executeUpdate();
-            }
-            return new PlayerMeta(playerUuid, 0, false);
         });
     }
 
     public void markOperatorCreated(UUID playerUuid) {
         db.runSync(conn -> {
-            getOrCreate(playerUuid);
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE player_meta SET has_created_operator = 1, last_operator_create = ? WHERE player_uuid = ?")) {
-                ps.setLong(1, System.currentTimeMillis());
-                ps.setString(2, playerUuid.toString());
-                ps.executeUpdate();
+            try {
+                getOrCreate(playerUuid);
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE player_meta SET has_created_operator = 1, last_operator_create = ? WHERE player_uuid = ?")) {
+                    ps.setLong(1, System.currentTimeMillis());
+                    ps.setString(2, playerUuid.toString());
+                    ps.executeUpdate();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing markOperatorCreated", e);
             }
             return null;
         });
