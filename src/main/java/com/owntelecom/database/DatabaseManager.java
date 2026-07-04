@@ -196,6 +196,8 @@ public class DatabaseManager {
                 st.execute("CREATE INDEX IF NOT EXISTS idx_stations_operator ON stations(operator_id)");
                 st.execute("CREATE INDEX IF NOT EXISTS idx_stations_world ON stations(world, x, z)");
                 st.execute("CREATE INDEX IF NOT EXISTS idx_subscribers_operator ON subscribers(operator_id)");
+            } catch (SQLException e) {
+                throw new RuntimeException("Error creating database schema", e);
             }
             return null;
         });
