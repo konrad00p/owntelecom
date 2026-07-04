@@ -23,6 +23,8 @@ public class SubscriberRepository {
                         return Optional.of(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findByPlayer", e);
             }
             return Optional.empty();
         });
@@ -38,6 +40,8 @@ public class SubscriberRepository {
                         list.add(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findByOperator", e);
             }
             return list;
         });
@@ -50,6 +54,8 @@ public class SubscriberRepository {
                 ps.setString(1, playerUuid.toString());
                 ps.setString(2, operatorId.toLowerCase(Locale.ROOT));
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing setOperator", e);
             }
             return null;
         });
@@ -60,6 +66,8 @@ public class SubscriberRepository {
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM subscribers WHERE player_uuid = ?")) {
                 ps.setString(1, playerUuid.toString());
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing clearOperator", e);
             }
             return null;
         });
@@ -82,6 +90,8 @@ public class SubscriberRepository {
                 ps.setLong(5, subscriber.packageExpiresAt());
                 ps.setString(6, subscriber.playerUuid().toString());
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing updatePackage", e);
             }
             return null;
         });
