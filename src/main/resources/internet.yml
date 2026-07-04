@@ -1,0 +1,39 @@
+# Konfiguracja internetu, serwerowni i stron
+
+hosting:
+  server-block: ENDER_CHEST
+  website-block: LECTERN
+  create-server-cost: 5000.0
+  create-website-cost: 200.0
+  max-pages-per-server: 50
+
+datacenter-levels:
+  1:
+    max-concurrent-visitors: 5
+    max-slots: 9
+    failure-chance: 0.06
+    upgrade-cost: 0
+  2:
+    max-concurrent-visitors: 15
+    max-slots: 18
+    failure-chance: 0.04
+    upgrade-cost: 10000.0
+  3:
+    max-concurrent-visitors: 40
+    max-slots: 27
+    failure-chance: 0.02
+    upgrade-cost: 25000.0
+
+page-templates:
+  default:
+    max-lines: 20
+    max-line-length: 50
+    allow-buttons: true
+    max-buttons: 5
+
+social-media:
+  enabled: true
+  platform-id: twitter
+  display-name: "&bMineTweet"
+  post-cost-mb: 2
+  format: "&b[@{author}] &f{message}"

@@ -1,0 +1,11 @@
+# Ustawienia globalne stacji (nadpisują domyślne z technologies.yml jeśli ustawione)
+
+defaults:
+  look-distance: 5
+  gui-title: "&8Stacja bazowa - {operator}"
+  show-failure-chance: true
+
+failure:
+  enabled: true
+  notify-owner: true
+  notify-online-only: true

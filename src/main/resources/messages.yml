@@ -1,0 +1,54 @@
+prefix: "&b[OwnTelecom] &r"
+
+errors:
+  no-permission: "{prefix}&cBrak uprawnień."
+  player-only: "{prefix}&cTa komenda jest tylko dla graczy."
+  player-not-found: "{prefix}&cGracz &e{player} &cnie został znaleziony."
+  no-operator: "{prefix}&cNie jesteś klientem żadnego operatora."
+  no-coverage: "{prefix}&cBrak zasięgu sieci."
+  no-internet-tech: "{prefix}&cTwoja technologia nie obsługuje internetu."
+  insufficient-funds: "{prefix}&cNiewystarczające środki (&e{cost}{currency}&c)."
+  vault-missing: "{prefix}&cVault nie jest dostępny."
+
+operator:
+  created: "{prefix}&aUtworzono operatora &e{name} &7(ID: &f{id}&7)."
+  deleted: "{prefix}&aOperator &e{name} &azostał usunięty."
+  already-exists: "{prefix}&cOperator o ID &e{id} &cjuż istnieje."
+  cooldown: "{prefix}&cMusisz poczekać &e{days} &cdni przed utworzeniem kolejnego operatora."
+  already-created-once: "{prefix}&cJuż utworzyłeś operatora. Drugą sieć możesz tylko przejąć."
+  transferred: "{prefix}&aOperator &e{name} &azostał przekazany graczowi &e{player}&a."
+  not-owner: "{prefix}&cNie jesteś właścicielem tego operatora."
+
+station:
+  created: "{prefix}&aStacja &e{tech} &apoziom &e{level} &azostała utworzona."
+  upgraded: "{prefix}&aStacja ulepszona do poziomu &e{level}&a."
+  repaired: "{prefix}&aStacja naprawiona."
+  broken: "{prefix}&cStacja &e{id} &culegła w awarii!"
+  wrong-block: "{prefix}&cMusisz patrzeć na blok &e{block}&c."
+
+call:
+  started: "{prefix}&aPołączenie z &e{player}&a. &7({cost}/min)"
+  ended: "{prefix}&7Połączenie zakończone."
+  no-agreement: "{prefix}&cBrak umowy między operatorami na połączenia."
+  confirm-extra: "{prefix}&ePołączenie do tej osoby jest dodatkowo płatne (strefa &f{zone}&e). &7Koszt: &f{cost}&7. Wpisz &e/call {player} confirm &7aby kontynuować."
+  roaming-connected: "{prefix}&aPołączono z siecią w roamingu (&e{zone}&a). Info: &e/stawki roaming {operator}"
+
+sms:
+  sent: "{prefix}&aSMS wysłany do &e{player}&a."
+  received: "{prefix}&e[SMS od {player}] &f{message}"
+  confirm-extra: "{prefix}&eSMS jest dodatkowo płatny (strefa &f{zone}&e). Wpisz &e/sms {player} confirm {message}"
+
+emergency:
+  sent: "{prefix}&cZgłoszenie alarmowe wysłane."
+  received: "{prefix}&4[112] &c{player}&7: &f{message} &7(&f{world} {x}, {y}, {z}&7)"
+
+internet:
+  page-loaded: "{prefix}&aStrona wczytana."
+  no-pages: "{prefix}&cBrak dostępnych stron."
+
+global-chat:
+  enabled: "{prefix}&aChat globalny &ewłączony&a."
+  disabled: "{prefix}&aChat globalny &ewyłączony&a. Chat lokalny aktywny."
+
+chat:
+  no-listeners: "{prefix}&8Nikt cię nie słyszał. Użyj &e/call &8lub &e/sms &8aby się skontaktować."

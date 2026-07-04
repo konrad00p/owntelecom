@@ -1,0 +1,67 @@
+name: OwnTelecom
+version: '${project.version}'
+main: com.owntelecom.OwnTelecomPlugin
+api-version: '1.20'
+authors: [OwnTelecom]
+description: Symulacja sieci komórkowych - operatorzy, stacje, połączenia, internet
+depend: [Vault]
+softdepend: []
+
+commands:
+  owntelecom:
+    description: Komendy administracyjne OwnTelecom
+    usage: /owntelecom <reload|globalchat|...>
+    permission: owntelecom.admin
+  operator:
+    description: Zarządzanie siecią komórkową
+    usage: /operator <utworz|usun|info|oddaj|przejmij|...>
+  stacja:
+    description: Zarządzanie stacjami bazowymi
+    usage: /stacja <utworz|ulepsz|napraw|info|...>
+  telefon:
+    description: Informacje o telefonie i operatorze
+    usage: /telefon <info|stawki|...>
+  call:
+    description: Połączenie telefoniczne
+    usage: /call <gracz>
+  sms:
+    description: Wiadomość SMS
+    usage: /sms <gracz> <wiadomość>
+  112:
+    description: Połączenie alarmowe
+    usage: /112 <wiadomość>
+  alarmowy:
+    description: Połączenie alarmowe
+    usage: /alarmowy <wiadomość>
+  internet:
+    description: Przeglądarka internetowa
+    usage: /internet
+  strona:
+    description: Edycja strony internetowej
+    usage: /strona <...>
+  serwerownia:
+    description: Zarządzanie serwerownią
+    usage: /serwerownia <...>
+  umowa:
+    description: Umowy między operatorami
+    usage: /umowa <...>
+  stawki:
+    description: Stawki operatora
+    usage: /stawki [roaming|polaczenia] [operator]
+  pakiet:
+    description: Pakiety subskrypcyjne
+    usage: /pakiet <...>
+
+permissions:
+  owntelecom.admin:
+    description: Pełny dostęp administracyjny
+    default: op
+  owntelecom.bypass.cooldown:
+    description: Pomija cooldown tworzenia operatora
+    default: op
+  owntelecom.bypass.chat:
+    description: Pomija ograniczenia chatu lokalnego
+    default: op
+  owntelecom.emergency.receive:
+    description: Otrzymuje zgłoszenia alarmowe
+    default: op

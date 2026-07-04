@@ -1,0 +1,44 @@
+# OwnTelecom - główna konfiguracja
+# Dokumentacja: https://github.com/owntelecom/OwnTelecom
+
+database:
+  type: sqlite
+  file: owntelecom.db
+  pool-size: 4
+
+chat:
+  enabled: true
+  local-radius: 10
+  format-local: "&7[LOCAL] &f{player}&7: &f{message}"
+  format-no-listeners: "&8Nikt cię nie słyszał. Użyj &e/call &8lub &e/sms &8aby się skontaktować."
+  global-override: false
+
+calls:
+  seconds-per-message: 60
+  glitch-chars-enabled: true
+  emergency-permission: owntelecom.emergency.receive
+
+sms:
+  max-length: 160
+  cost-per-sms: true
+
+internet:
+  click-cost-mb: 5
+  loading-message: "&7Wczytywanie strony..."
+  social-media-command: tweet
+
+operator:
+  create-cost: 1000.0
+  create-cooldown-days: 7
+  max-owned-networks: -1
+  id-pattern: "^[a-z0-9]{3,16}$"
+  auto-roaming-between-same-owner: true
+
+economy:
+  currency-symbol: "$"
+
+performance:
+  coverage-cache-ms: 500
+  coverage-move-threshold: 2
+  failure-check-interval-minutes: 30
+  spatial-chunk-size: 16
