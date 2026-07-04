@@ -22,6 +22,8 @@ public class WebsiteRepository {
                 while (rs.next()) {
                     list.add(map(rs));
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findEnabled", e);
             }
             return list;
         });
@@ -36,6 +38,8 @@ public class WebsiteRepository {
                         return Optional.of(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findBySlug", e);
             }
             return Optional.empty();
         });
@@ -64,6 +68,8 @@ public class WebsiteRepository {
                         return keys.getInt(1);
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing create", e);
             }
             return -1;
         });
@@ -80,6 +86,8 @@ public class WebsiteRepository {
                         lines.add(rs.getString("content"));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing getLines", e);
             }
             return lines;
         });
@@ -87,19 +95,23 @@ public class WebsiteRepository {
 
     public void setLines(int websiteId, List<String> lines) {
         db.runSync(conn -> {
-            try (PreparedStatement del = conn.prepareStatement("DELETE FROM website_lines WHERE website_id = ?")) {
-                del.setInt(1, websiteId);
-                del.executeUpdate();
-            }
-            try (PreparedStatement ins = conn.prepareStatement(
-                    "INSERT INTO website_lines (website_id, sort_order, content) VALUES (?,?,?)")) {
-                for (int i = 0; i < lines.size(); i++) {
-                    ins.setInt(1, websiteId);
-                    ins.setInt(2, i);
-                    ins.setString(3, lines.get(i));
-                    ins.addBatch();
+            try {
+                try (PreparedStatement del = conn.prepareStatement("DELETE FROM website_lines WHERE website_id = ?")) {
+                    del.setInt(1, websiteId);
+                    del.executeUpdate();
                 }
-                ins.executeBatch();
+                try (PreparedStatement ins = conn.prepareStatement(
+                        "INSERT INTO website_lines (website_id, sort_order, content) VALUES (?,?,?)")) {
+                    for (int i = 0; i < lines.size(); i++) {
+                        ins.setInt(1, websiteId);
+                        ins.setInt(2, i);
+                        ins.setString(3, lines.get(i));
+                        ins.addBatch();
+                    }
+                    ins.executeBatch();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing setLines", e);
             }
             return null;
         });
@@ -111,6 +123,8 @@ public class WebsiteRepository {
                 ps.setInt(1, enabled ? 1 : 0);
                 ps.setInt(2, id);
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing setEnabled", e);
             }
             return null;
         });
