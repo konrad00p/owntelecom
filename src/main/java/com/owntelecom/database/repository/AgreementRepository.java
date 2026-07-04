@@ -31,6 +31,8 @@ public class AgreementRepository {
                         return Optional.of(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing find", e);
             }
             return Optional.empty();
         });
@@ -55,6 +57,8 @@ public class AgreementRepository {
                 ps.setInt(10, agreement.passCallToClient() ? 1 : 0);
                 ps.setInt(11, agreement.active() ? 1 : 0);
                 ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing create", e);
             }
             return null;
         });
