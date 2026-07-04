@@ -27,6 +27,8 @@ public class PackageRepository {
                         list.add(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findByOperator", e);
             }
             return list;
         });
@@ -41,6 +43,8 @@ public class PackageRepository {
                         return Optional.of(map(rs));
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing findById", e);
             }
             return Optional.empty();
         });
@@ -65,6 +69,8 @@ public class PackageRepository {
                         return keys.getInt(1);
                     }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error executing create", e);
             }
             return -1;
         });
@@ -79,7 +85,7 @@ public class PackageRepository {
                 rs.getDouble("minutes"),
                 rs.getDouble("sms"),
                 rs.getDouble("mb"),
-                rs.getInt("duration_days"),
+                rs.setInt("duration_days"),
                 rs.getString("zone_id")
         );
     }
