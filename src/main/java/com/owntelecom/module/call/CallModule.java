@@ -7,12 +7,17 @@ import com.owntelecom.database.model.Subscriber;
 import com.owntelecom.module.OwnTelecomModule;
 import com.owntelecom.service.CoverageResult;
 import com.owntelecom.service.SignalService;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
 import java.util.*;
 
-public class CallModule implements OwnTelecomModule {
+public class CallModule implements OwnTelecomModule, Listener {
 
     private OwnTelecomPlugin plugin;
     private final Map<UUID, ActiveCall> activeCalls = new HashMap<>();
@@ -24,7 +29,8 @@ public class CallModule implements OwnTelecomModule {
     @Override
     public void enable(OwnTelecomPlugin plugin) {
         this.plugin = plugin;
-        org.bukkit.Bukkit.getPluginManager().registerEvents(new CallChatListener(plugin), plugin);
+        // Rejestrujemy ten moduł jako listener bezpośrednio, bez szukania zaginionej klasy!
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
@@ -36,6 +42,19 @@ public class CallModule implements OwnTelecomModule {
     @Override
     public String getName() {
         return "Call";
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerChatInCall(AsyncChatEvent event) {
+        Player sender = event.getPlayer();
+        if (isInCall(sender.getUniqueId())) {
+            // Jeśli gracz jest w trakcie rozmowy, jego chat idzie w słuchawkę, a nie na serwer globalny
+            event.setCancelled(true);
+            String message = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
+            
+            // Przenosimy obsługę wiadomości do wątku głównego serwera, bo Bukkit API tego wymaga
+            Bukkit.getScheduler().runTask(plugin, () -> sendCallMessage(sender, message));
+        }
     }
 
     public boolean startCall(Player caller, Player callee, boolean confirmed) {
