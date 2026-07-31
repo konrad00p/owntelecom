@@ -42,6 +42,9 @@ commands:
     description: Zarządzanie chatem lokalnym i globalnym
     usage: /chat <wlacz/wylacz/status/promien/toggle>
     permission: owntelecom.admin
+  operator:
+    description: Zarządzanie operatorami sieci komórkowych
+    usage: /operator <utworz/usun/pr
 
 permissions:
   owntelecom.admin:
