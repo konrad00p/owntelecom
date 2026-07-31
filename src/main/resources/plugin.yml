@@ -1,0 +1,48 @@
+name: OwnTelecom
+version: 1.0.0
+main: pl.owntelecom.OwnTelecom
+api-version: 1.20
+depend: [Vault]
+authors: [TwojaNazwa]
+description: System telekomunikacyjny dla serwerów Minecraft
+
+commands:
+  telefon:
+    description: Główne komendy systemu telekomunikacyjnego
+    usage: /telefon <info>
+  call:
+    description: Dzwoni do innego gracza
+    usage: /call <nick>
+  sms:
+    description: Wysyła SMS do innego gracza
+    usage: /sms <nick> <treść>
+  odbierz:
+    description: Odbiera połączenie
+    usage: /odbierz
+  rozlacz:
+    description: Rozłącza połączenie
+    usage: /rozlacz
+  alarmowy:
+    description: Wysyła zgłoszenie alarmowe
+    usage: /alarmowy <treść>
+    aliases: [112]
+  operator:
+    description: Zarządzanie operatorem
+    usage: /operator <utworz/usun/przekaz/ustawienia>
+  stacja:
+    description: Zarządzanie stacjami bazowymi
+    usage: /stacja <utworz/ulepsz/usun/info> [id_operatora]
+  internet:
+    description: Otwiera przeglądarkę internetową
+    usage: /internet [strona]
+  allegro:
+    description: Otwiera globalny sklep Allegro
+    usage: /allegro
+
+permissions:
+  owntelecom.admin:
+    description: Pełny dostęp administracyjny
+    default: op
+  owntelecom.user:
+    description: Podstawowy dostęp dla graczy
+    default: true
