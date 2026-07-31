@@ -1,0 +1,49 @@
+# OwnTelecom - Główna konfiguracja
+
+# Ustawienia chatu lokalnego
+chat:
+  lokalny:
+    enabled: true
+    promien: 10
+    brak_odbiorcy_komunikat: "&7Nikt Cię nie słyszał..."
+  globalny:
+    enabled: false
+    prefix: "&6[Globalny] "
+
+# Ustawienia operatorów
+operator:
+  cooldown_dni: 7
+  max_operatorow_na_gracza: 1
+  auto_roaming_wlasny: true
+
+# Ustawienia połączeń
+polaczenia:
+  wiadomosci_na_minute: 1
+  znieksztalcanie_przy_slabym_zasiegu: true
+  minimalna_predkosc_internet: 0.5
+
+# Ustawienia stacji bazowych
+stacje:
+  budowa:
+    blok: IRON_BLOCK
+    dodatek: OAK_FENCE
+  awarie:
+    szansa_bazowa: 10.0
+    koszt_naprawy: 1000.0
+    cooldown_naprawa_godziny: 24
+
+# Strefy roamingowe
+strefy:
+  "0":
+    nazwa: "Strefa 0 - Home"
+    roaming_domyslny: true
+  "1":
+    nazwa: "Strefa 1"
+    roaming_domyslny: false
+  "2":
+    nazwa: "Strefa 2"
+    roaming_domyslny: false
+
+# Vault
+vault:
+  prefix_konta: ""
