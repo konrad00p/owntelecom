@@ -102,3 +102,95 @@ public class TelefonCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage(ChatColor.RED + "  ⚠ Minuty wyczerpane!");
                 }
                 if (sub.getRemainingSms() != -1 && sub.getRemainingSms() == 0) {
+                    player.sendMessage(ChatColor.RED + "  ⚠ SMS wyczerpane!");
+                }
+                if (sub.getRemainingMegabytes() != -1 && sub.getRemainingMegabytes() == 0) {
+                    player.sendMessage(ChatColor.RED + "  ⚠ Dane wyczerpane!");
+                }
+                
+                player.sendMessage("");
+            }
+        }
+    }
+
+    private void handleRates(Player player, String[] args) {
+        String type = args[1].toLowerCase();
+        
+        if (type.equals("krajowy") || type.equals("domestic")) {
+            player.sendMessage(ChatColor.GOLD + "══════ Stawki krajowe ══════");
+            var operators = plugin.getOperatorManager().getActiveOperators();
+            
+            for (var op : operators) {
+                if (plugin.getStationManager().isPlayerInRange(player, op.getId())) {
+                    player.sendMessage(ChatColor.YELLOW + "▸ " + op.getDisplayName());
+                    player.sendMessage(ChatColor.GRAY + "  Minuta: $" + op.getRate("minuta"));
+                    player.sendMessage(ChatColor.GRAY + "  SMS: $" + op.getRate("sms"));
+                    player.sendMessage(ChatColor.GRAY + "  MB: $" + op.getRate("mb"));
+                }
+            }
+        } else if (type.equals("roaming")) {
+            player.sendMessage(ChatColor.GOLD + "══════ Stawki roamingowe ══════");
+            var operators = plugin.getOperatorManager().getActiveOperators();
+            
+            for (var op : operators) {
+                if (plugin.getAgreementManager().isPlayerRoaming(player, op.getId())) {
+                    player.sendMessage(ChatColor.YELLOW + "▸ " + op.getDisplayName() + " (Roaming)");
+                    player.sendMessage(ChatColor.GRAY + "  Minuta: $" + op.getRoamingRate("minuta"));
+                    player.sendMessage(ChatColor.GRAY + "  SMS: $" + op.getRoamingRate("sms"));
+                    player.sendMessage(ChatColor.GRAY + "  MB: $" + op.getRoamingRate("mb"));
+                }
+            }
+        }
+    }
+
+    private void handleOperatorInfo(Player player) {
+        player.sendMessage(ChatColor.GOLD + "══════ Dostępni operatorzy ══════");
+        
+        for (var op : plugin.getOperatorManager().getActiveOperators()) {
+            boolean inRange = plugin.getStationManager().isPlayerInRange(player, op.getId());
+            String status = inRange ? ChatColor.GREEN + "✓ W zasięgu" : ChatColor.RED + "✗ Brak zasięgu";
+            
+            player.sendMessage(ChatColor.YELLOW + "▸ " + op.getDisplayName() + " " + status);
+            
+            var bestStation = plugin.getStationManager().findBestStation(player, op.getId());
+            if (bestStation != null) {
+                player.sendMessage(ChatColor.GRAY + "  Technologia: " + bestStation.getTechnology() + 
+                    " | Jakość: " + String.format("%.0f%%", bestStation.getSignalQuality(player.getLocation()) * 100));
+            }
+        }
+    }
+
+    private void showHelp(Player player) {
+        player.sendMessage(ChatColor.GOLD + "══════ 📱 Telefon - Pomoc ══════");
+        player.sendMessage(ChatColor.YELLOW + "/telefon info " + ChatColor.WHITE + "- Stan konta i pakietów");
+        player.sendMessage(ChatColor.YELLOW + "/telefon pakiety " + ChatColor.WHITE + "- Dostępne oferty");
+        player.sendMessage(ChatColor.YELLOW + "/telefon kup <ID> " + ChatColor.WHITE + "- Kup pakiet");
+        player.sendMessage(ChatColor.YELLOW + "/telefon pakiet " + ChatColor.WHITE + "- Status pakietu");
+        player.sendMessage(ChatColor.YELLOW + "/telefon stawki <krajowy/roaming> " + ChatColor.WHITE + "- Stawki");
+        player.sendMessage(ChatColor.YELLOW + "/telefon operator " + ChatColor.WHITE + "- Dostępni operatorzy");
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+
+        if (args.length == 1) {
+            completions.addAll(Arrays.asList("info", "pakiety", "kup", "pakiet", "stawki", "operator"));
+        } else if (args.length == 2) {
+            switch (args[0].toLowerCase()) {
+                case "kup":
+                    completions.addAll(plugin.getBillingManager().getAllSubscriptions().stream()
+                        .map(Subscription::getId)
+                        .collect(Collectors.toList()));
+                    break;
+                case "stawki":
+                    completions.addAll(Arrays.asList("krajowy", "roaming"));
+                    break;
+            }
+        }
+
+        return completions.stream()
+            .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+            .collect(Collectors.toList());
+    }
+}
