@@ -48,6 +48,17 @@ commands:
   umowa:
     description: Zarządzanie umowami między operatorami
     usage: /umowa <zaproponuj/akceptuj/odrzuc/zerwij/strefy/roaming>
+  zasieg:
+    description: Sprawdza stan sieci - /zasieg (obecny) lub /zasieg all (wszystkie)
+    usage: /zasieg [all]
+    aliases: [zasiegall, siec, sygnal, network]
+  przelacz:
+    description: Przełącza do innego operatora
+    usage: /przelacz <operator/auto/home>
+    aliases: [switch, connect]
+  roaming:
+    description: Włącza/wyłącza automatyczny roaming
+    usage: /roaming <wlacz/wylacz>
 
 permissions:
   owntelecom.admin:
