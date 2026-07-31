@@ -38,6 +38,10 @@ commands:
   allegro:
     description: Otwiera globalny sklep Allegro
     usage: /allegro
+  chat:
+    description: Zarządzanie chatem lokalnym i globalnym
+    usage: /chat <wlacz/wylacz/status/promien/toggle>
+    permission: owntelecom.admin
 
 permissions:
   owntelecom.admin:
