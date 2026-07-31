@@ -1,0 +1,42 @@
+name: Build OwnTelecom Plugin
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Build with Maven
+      run: mvn clean package -B
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: OwnTelecom-Plugin
+        path: target/OwnTelecom-*.jar
+        retention-days: 30
+    
+    - name: Create Release (only on tag push)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: target/OwnTelecom-*.jar
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
