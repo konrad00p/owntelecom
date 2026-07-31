@@ -18,6 +18,9 @@ public final class OwnTelecom extends JavaPlugin {
     private StationManager stationManager;
     private CallManager callManager;
     private InternetManager internetManager;
+    
+    // Listener - dodane pole dla ChatListener
+    private ChatListener chatListener;
 
     @Override
     public void onEnable() {
@@ -40,11 +43,11 @@ public final class OwnTelecom extends JavaPlugin {
         this.callManager = new CallManager(this);
         this.internetManager = new InternetManager(this);
         
+        // Rejestracja listenerów (przed komendami, bo ChatCommand potrzebuje chatListener)
+        registerListeners();
+        
         // Rejestracja komend
         registerCommands();
-        
-        // Rejestracja listenerów
-        registerListeners();
         
         getLogger().info("OwnTelecom został pomyślnie włączony!");
     }
@@ -54,6 +57,11 @@ public final class OwnTelecom extends JavaPlugin {
         // Zapisanie danych przed wyłączeniem
         if (operatorManager != null) operatorManager.saveAll();
         if (stationManager != null) stationManager.saveAll();
+        
+        // Wyczyść chat listener
+        if (chatListener != null) {
+            chatListener = null;
+        }
         
         getLogger().info("OwnTelecom został wyłączony.");
     }
@@ -71,6 +79,7 @@ public final class OwnTelecom extends JavaPlugin {
     }
 
     private void registerCommands() {
+        // Komendy podstawowe
         new TelefonCommand(this);
         new CallCommand(this);
         new SmsCommand(this);
@@ -80,10 +89,16 @@ public final class OwnTelecom extends JavaPlugin {
         new OperatorCommand(this);
         new StacjaCommand(this);
         new InternetCommand(this);
+        
+        // NOWA KOMENDA - ChatCommand (dodana)
+        new ChatCommand(this, chatListener);
     }
 
     private void registerListeners() {
-        getServer().getListenerRegistrar().register(new ChatListener(this));
+        // Tworzymy ChatListener i zapisujemy referencję
+        this.chatListener = new ChatListener(this);
+        // Rejestrujemy listener w PluginManager (poprawiona metoda)
+        getServer().getPluginManager().registerEvents(chatListener, this);
     }
 
     // Gettery
@@ -94,4 +109,5 @@ public final class OwnTelecom extends JavaPlugin {
     public StationManager getStationManager() { return stationManager; }
     public CallManager getCallManager() { return callManager; }
     public InternetManager getInternetManager() { return internetManager; }
+    public ChatListener getChatListener() { return chatListener; } // Dodany getter
 }
