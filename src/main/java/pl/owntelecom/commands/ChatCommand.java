@@ -1,5 +1,6 @@
 package pl.owntelecom.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +17,8 @@ public class ChatCommand implements CommandExecutor {
     public ChatCommand(OwnTelecom plugin, ChatListener chatListener) {
         this.plugin = plugin;
         this.chatListener = chatListener;
+        // Rejestracja komendy
+        plugin.getCommand("chat").setExecutor(this);
     }
 
     @Override
