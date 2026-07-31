@@ -1,0 +1,44 @@
+# Konfiguracja technologii stacji bazowych
+
+technologies:
+  "2G":
+    nazwa: "2G (EDGE)"
+    opis: "Podstawowa technologia - idealna do połączeń i SMS"
+    predkosc_mbs: 0.5
+    zasieg_bazowy: 80
+    obsluguje_internet: false
+    cena_budowy: 1000.0
+    kolor: "&7"
+    
+  LTE:
+    nazwa: "4G LTE"
+    opis: "Szybki internet i dobre połączenia"
+    predkosc_mbs: 100.0
+    zasieg_bazowy: 60
+    obsluguje_internet: true
+    cena_budowy: 5000.0
+    kolor: "&b"
+    
+  "5G":
+    nazwa: "5G"
+    opis: "Ultra szybki internet, krótki zasięg"
+    predkosc_mbs: 500.0
+    zasieg_bazowy: 40
+    obsluguje_internet: true
+    cena_budowy: 15000.0
+    kolor: "&d"
+
+# Konfiguracja spadku prędkości
+predkosc:
+  minimalny_procent: 1.0
+  odleglosc_od_ktorej_spada: 5.0
+  wykladnik_spadku: 1.5
+
+# Konfiguracja awarii
+awarie:
+  szansa_bazowa_poziom1: 15.0
+  szansa_bazowa_poziom2: 8.0
+  szansa_bazowa_poziom3: 3.0
+  interwal_sprawdzania_minuty: 30
+  koszt_naprawy_bazowy: 1000.0
+  koszt_naprawy_mnoznik_poziomu: 1.5
