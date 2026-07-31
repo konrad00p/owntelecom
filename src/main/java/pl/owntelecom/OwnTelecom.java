@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import pl.owntelecom.commands.*;
 import pl.owntelecom.listeners.ChatListener;
 import pl.owntelecom.listeners.CallListener;
+import pl.owntelecom.listeners.MarketListener;
 import pl.owntelecom.managers.*;
 
 public final class OwnTelecom extends JavaPlugin {
@@ -19,6 +20,9 @@ public final class OwnTelecom extends JavaPlugin {
     private StationManager stationManager;
     private CallManager callManager;
     private InternetManager internetManager;
+    
+    // Komendy z referencjami
+    private AllegroCommand allegroCommand;
     
     // Listenery
     private ChatListener chatListener;
@@ -58,6 +62,7 @@ public final class OwnTelecom extends JavaPlugin {
         // Zapisanie danych przed wyłączeniem
         if (operatorManager != null) operatorManager.saveAll();
         if (stationManager != null) stationManager.saveAll();
+        if (internetManager != null) internetManager.saveAll();
         
         // Wyczyść listenery
         if (chatListener != null) {
@@ -91,6 +96,9 @@ public final class OwnTelecom extends JavaPlugin {
         new StacjaCommand(this);
         new InternetCommand(this);
         
+        // Komenda Allegro (zapisujemy referencję)
+        this.allegroCommand = new AllegroCommand(this);
+        
         // Komendy administracyjne
         new ChatCommand(this, chatListener);
     }
@@ -100,8 +108,11 @@ public final class OwnTelecom extends JavaPlugin {
         this.chatListener = new ChatListener(this);
         getServer().getPluginManager().registerEvents(chatListener, this);
         
-        // CallListener - NOWY! Obsługa połączeń i rozłączania graczy
+        // CallListener - Obsługa połączeń i rozłączania graczy
         getServer().getPluginManager().registerEvents(new CallListener(this), this);
+        
+        // MarketListener - Obsługa GUI Allegro
+        getServer().getPluginManager().registerEvents(new MarketListener(this), this);
     }
 
     // Gettery
@@ -113,4 +124,5 @@ public final class OwnTelecom extends JavaPlugin {
     public CallManager getCallManager() { return callManager; }
     public InternetManager getInternetManager() { return internetManager; }
     public ChatListener getChatListener() { return chatListener; }
+    public AllegroCommand getAllegroCommand() { return allegroCommand; }
 }
