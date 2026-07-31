@@ -20,6 +20,7 @@ public final class OwnTelecom extends JavaPlugin {
     private StationManager stationManager;
     private CallManager callManager;
     private InternetManager internetManager;
+    private AgreementManager agreementManager;
     
     // Komendy z referencjami
     private AllegroCommand allegroCommand;
@@ -47,6 +48,7 @@ public final class OwnTelecom extends JavaPlugin {
         this.stationManager = new StationManager(this);
         this.callManager = new CallManager(this);
         this.internetManager = new InternetManager(this);
+        this.agreementManager = new AgreementManager(this);
         
         // Rejestracja listenerów (przed komendami)
         registerListeners();
@@ -63,6 +65,7 @@ public final class OwnTelecom extends JavaPlugin {
         if (operatorManager != null) operatorManager.saveAll();
         if (stationManager != null) stationManager.saveAll();
         if (internetManager != null) internetManager.saveAll();
+        if (agreementManager != null) agreementManager.saveAll();
         
         // Wyczyść listenery
         if (chatListener != null) {
@@ -95,6 +98,7 @@ public final class OwnTelecom extends JavaPlugin {
         new OperatorCommand(this);
         new StacjaCommand(this);
         new InternetCommand(this);
+        new UmowaCommand(this);
         
         // Komenda Allegro (zapisujemy referencję)
         this.allegroCommand = new AllegroCommand(this);
@@ -123,6 +127,7 @@ public final class OwnTelecom extends JavaPlugin {
     public StationManager getStationManager() { return stationManager; }
     public CallManager getCallManager() { return callManager; }
     public InternetManager getInternetManager() { return internetManager; }
+    public AgreementManager getAgreementManager() { return agreementManager; }
     public ChatListener getChatListener() { return chatListener; }
     public AllegroCommand getAllegroCommand() { return allegroCommand; }
 }
