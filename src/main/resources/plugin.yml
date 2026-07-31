@@ -45,6 +45,9 @@ commands:
   operator:
     description: Zarządzanie operatorami sieci komórkowych
     usage: /operator <utworz/usun/pr
+  umowa:
+    description: Zarządzanie umowami między operatorami
+    usage: /umowa <zaproponuj/akceptuj/odrzuc/zerwij/strefy/roaming>
 
 permissions:
   owntelecom.admin:
