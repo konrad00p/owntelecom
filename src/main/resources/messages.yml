@@ -1,0 +1,13 @@
+chat:
+  lokalny:
+    prefix: "&7[Lokalny] "
+    brak_odbiorcy: "&7Nikt Cię nie słyszał..."
+    nikt_w_zasiegu: "&8* Twoja wiadomość została wysłana, ale nikogo nie ma w pobliżu *"
+  globalny:
+    prefix: "&6[Globalny] "
+    wlaczony: "&aChat globalny został włączony!"
+    wylaczony: "&cChat globalny został wyłączony! Aktywny chat lokalny."
+  admin:
+    brak_uprawnien: "&cNie masz uprawnień do zarządzania chatem!"
+    promien_zmieniony: "&aPromień chatu lokalnego zmieniony na: &e{radius} &abloków"
+    nieprawidlowy_promien: "&cPromień musi być liczbą między 1 a 1000!"
