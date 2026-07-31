@@ -22,6 +22,7 @@ public final class OwnTelecom extends JavaPlugin {
     private InternetManager internetManager;
     private AgreementManager agreementManager;
     private BillingManager billingManager;
+    private NetworkManager networkManager;
     
     // Komendy z referencjami
     private AllegroCommand allegroCommand;
@@ -51,6 +52,7 @@ public final class OwnTelecom extends JavaPlugin {
         this.internetManager = new InternetManager(this);
         this.agreementManager = new AgreementManager(this);
         this.billingManager = new BillingManager(this);
+        this.networkManager = new NetworkManager(this);
         
         // Rejestracja listenerów (przed komendami)
         registerListeners();
@@ -103,6 +105,11 @@ public final class OwnTelecom extends JavaPlugin {
         new InternetCommand(this);
         new UmowaCommand(this);
         
+        // Komendy sieciowe
+        new ZasiegCommand(this);
+        new PrzelaczCommand(this);
+        new RoamingCommand(this);
+        
         // Komenda Allegro (zapisujemy referencję)
         this.allegroCommand = new AllegroCommand(this);
         
@@ -132,6 +139,7 @@ public final class OwnTelecom extends JavaPlugin {
     public InternetManager getInternetManager() { return internetManager; }
     public AgreementManager getAgreementManager() { return agreementManager; }
     public BillingManager getBillingManager() { return billingManager; }
+    public NetworkManager getNetworkManager() { return networkManager; }
     public ChatListener getChatListener() { return chatListener; }
     public AllegroCommand getAllegroCommand() { return allegroCommand; }
 }
