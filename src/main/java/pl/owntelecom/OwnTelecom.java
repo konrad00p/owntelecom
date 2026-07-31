@@ -5,6 +5,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.owntelecom.commands.*;
 import pl.owntelecom.listeners.ChatListener;
+import pl.owntelecom.listeners.CallListener;
 import pl.owntelecom.managers.*;
 
 public final class OwnTelecom extends JavaPlugin {
@@ -19,7 +20,7 @@ public final class OwnTelecom extends JavaPlugin {
     private CallManager callManager;
     private InternetManager internetManager;
     
-    // Listener - dodane pole dla ChatListener
+    // Listenery
     private ChatListener chatListener;
 
     @Override
@@ -43,7 +44,7 @@ public final class OwnTelecom extends JavaPlugin {
         this.callManager = new CallManager(this);
         this.internetManager = new InternetManager(this);
         
-        // Rejestracja listenerów (przed komendami, bo ChatCommand potrzebuje chatListener)
+        // Rejestracja listenerów (przed komendami)
         registerListeners();
         
         // Rejestracja komend
@@ -58,7 +59,7 @@ public final class OwnTelecom extends JavaPlugin {
         if (operatorManager != null) operatorManager.saveAll();
         if (stationManager != null) stationManager.saveAll();
         
-        // Wyczyść chat listener
+        // Wyczyść listenery
         if (chatListener != null) {
             chatListener = null;
         }
@@ -90,15 +91,17 @@ public final class OwnTelecom extends JavaPlugin {
         new StacjaCommand(this);
         new InternetCommand(this);
         
-        // NOWA KOMENDA - ChatCommand (dodana)
+        // Komendy administracyjne
         new ChatCommand(this, chatListener);
     }
 
     private void registerListeners() {
-        // Tworzymy ChatListener i zapisujemy referencję
+        // ChatListener
         this.chatListener = new ChatListener(this);
-        // Rejestrujemy listener w PluginManager (poprawiona metoda)
         getServer().getPluginManager().registerEvents(chatListener, this);
+        
+        // CallListener - NOWY! Obsługa połączeń i rozłączania graczy
+        getServer().getPluginManager().registerEvents(new CallListener(this), this);
     }
 
     // Gettery
@@ -109,5 +112,5 @@ public final class OwnTelecom extends JavaPlugin {
     public StationManager getStationManager() { return stationManager; }
     public CallManager getCallManager() { return callManager; }
     public InternetManager getInternetManager() { return internetManager; }
-    public ChatListener getChatListener() { return chatListener; } // Dodany getter
+    public ChatListener getChatListener() { return chatListener; }
 }
