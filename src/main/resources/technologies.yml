@@ -3,7 +3,6 @@
 technologies:
   "2G":
     nazwa: "2G (EDGE)"
-    opis: "Podstawowa technologia - idealna do połączeń i SMS"
     predkosc_mbs: 0.5
     zasieg_bazowy: 80
     obsluguje_internet: false
@@ -12,7 +11,6 @@ technologies:
     
   LTE:
     nazwa: "4G LTE"
-    opis: "Szybki internet i dobre połączenia"
     predkosc_mbs: 100.0
     zasieg_bazowy: 60
     obsluguje_internet: true
@@ -21,12 +19,19 @@ technologies:
     
   "5G":
     nazwa: "5G"
-    opis: "Ultra szybki internet, krótki zasięg"
     predkosc_mbs: 500.0
     zasieg_bazowy: 40
     obsluguje_internet: true
     cena_budowy: 15000.0
     kolor: "&d"
+
+  WiFi:
+    nazwa: "Stacja WiFi"
+    predkosc_mbs: 300.0
+    zasieg_bazowy: 25
+    obsluguje_internet: true
+    cena_budowy: 7500.0
+    kolor: "&a"
 
 # Konfiguracja spadku prędkości
 predkosc:
