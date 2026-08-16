@@ -77,7 +77,6 @@ public class OperatorCommand implements CommandExecutor, TabCompleter {
 
             case "info":
                 if (args.length < 2) {
-                    // Pokaż info o wszystkich operatorach gracza
                     handleListMyOperators(player);
                 } else {
                     handleInfo(player, args[1]);
@@ -107,6 +106,34 @@ public class OperatorCommand implements CommandExecutor, TabCompleter {
                 handleEmployee(player, args);
                 break;
 
+            case "pakiet":
+            case "package":
+                if (args.length < 2) {
+                    sendPackageHelp(player);
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("utworz") || args[1].equalsIgnoreCase("create")) {
+                    handleCreatePackage(player, args);
+                } else if (args[1].equalsIgnoreCase("lista") || args[1].equalsIgnoreCase("list")) {
+                    if (args.length < 3) {
+                        player.sendMessage(ChatColor.RED + "Użycie: /operator pakiet lista <ID_Operatora>");
+                        return true;
+                    }
+                    handleListPackages(player, args[2]);
+                } else {
+                    sendPackageHelp(player);
+                }
+                break;
+
+            case "pakiety":
+            case "packages":
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Użycie: /operator pakiety <ID_Operatora>");
+                    return true;
+                }
+                handleListPackages(player, args[1]);
+                break;
+
             case "admin":
                 if (player.hasPermission("owntelecom.admin")) {
                     handleAdmin(player, args);
@@ -123,16 +150,13 @@ public class OperatorCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    // ==================== ISTNIEJĄCE METODY ====================
+
     private void handleCreate(Player player, String id, String displayName) {
-        // Walidacja ID (tylko litery i cyfry)
         if (!id.matches("^[a-zA-Z0-9]+$")) {
             player.sendMessage(ChatColor.RED + "ID może zawierać tylko litery i cyfry!");
             return;
         }
-
-        // Łączenie argumentów nazwy wyświetlanej (może zawierać spacje)
-        StringBuilder displayBuilder = new StringBuilder(displayName);
-        // Obsługa nazw ze spacjami jest w arg[2]+, ale przy uproszczonej obsłudze bierzemy tylko args[2]
 
         plugin.getOperatorManager().createOperator(player, id, displayName);
     }
@@ -238,7 +262,6 @@ public class OperatorCommand implements CommandExecutor, TabCompleter {
         if (args.length >= 4) {
             operatorId = args[3];
         } else {
-            // Weź pierwszego operatora gracza
             List<Operator> myOps = plugin.getOperatorManager().getOperatorsByOwner(player.getUniqueId());
             if (myOps.isEmpty()) {
                 player.sendMessage(ChatColor.RED + "Nie posiadasz żadnego operatora!");
@@ -298,6 +321,76 @@ public class OperatorCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.YELLOW + "Pracownicy: " + ChatColor.WHITE + op.getEmployees().size());
     }
 
+    // ==================== NOWE METODY PAKIETÓW ====================
+
+    private void handleCreatePackage(Player player, String[] args) {
+        if (args.length < 10) {
+            sendPackageCreateHelp(player);
+            return;
+        }
+
+        String operatorId = args[2];
+        String name = args[3];
+        String typeStr = args[4].toUpperCase();
+
+        try {
+            double price = Double.parseDouble(args[5]);
+            int days = Integer.parseInt(args[6]);
+            int minutes = Integer.parseInt(args[7]);
+            int sms = Integer.parseInt(args[8]);
+            int megabytes = Integer.parseInt(args[9]);
+
+            plugin.getBillingManager().createSubscription(
+                player, operatorId, name, typeStr, price, days, minutes, sms, megabytes);
+        } catch (NumberFormatException e) {
+            player.sendMessage(ChatColor.RED + "Nieprawidłowe liczby! Sprawdź: cena, dni, min, sms, mb.");
+        }
+    }
+
+    private void handleListPackages(Player player, String operatorId) {
+        var packages = plugin.getBillingManager().getOperatorSubscriptions(operatorId);
+
+        if (packages.isEmpty()) {
+            player.sendMessage(ChatColor.YELLOW + "Ten operator nie ma jeszcze pakietów.");
+            player.sendMessage(ChatColor.GRAY + "Utwórz: /operator pakiet utworz " + operatorId + " ...");
+            return;
+        }
+
+        Operator op = plugin.getOperatorManager().getOperator(operatorId);
+        String opName = op != null ? op.getDisplayName() : operatorId;
+
+        player.sendMessage(ChatColor.GOLD + "=== Pakiety: " + opName + " ===");
+
+        for (var pkg : packages) {
+            String typeIcon = pkg.getType().name().equals("ROAMING") ? "🌍" : "📱";
+            player.sendMessage(typeIcon + " " + ChatColor.GREEN + pkg.getName() + 
+                ChatColor.WHITE + " - $" + String.format("%.2f", pkg.getPrice()));
+            player.sendMessage(ChatColor.GRAY + "  ID: " + pkg.getId() + 
+                " | 📞 " + (pkg.isUnlimitedMinutes() ? "∞" : pkg.getMinutes()) +
+                " | 💬 " + (pkg.isUnlimitedSms() ? "∞" : pkg.getSms()) +
+                " | 🌐 " + (pkg.isUnlimitedData() ? "∞" : pkg.getMegabytes()) + "MB");
+            player.sendMessage(ChatColor.GRAY + "  ⏰ " + 
+                (pkg.getDurationDays() > 0 ? pkg.getDurationDays() + " dni" : "Bezterminowy") +
+                " | Strefa: " + pkg.getZoneId());
+        }
+    }
+
+    private void sendPackageHelp(Player player) {
+        player.sendMessage(ChatColor.GOLD + "=== Pakiety - Pomoc ===");
+        player.sendMessage(ChatColor.YELLOW + "/operator pakiet utworz <ID_Op> <nazwa> <typ> <cena> <dni> <min> <sms> <mb>");
+        player.sendMessage(ChatColor.GRAY + "Typ: DOMESTIC lub ROAMING | -1 = nielimitowane | 0 dni = bezterminowy");
+        player.sendMessage(ChatColor.YELLOW + "/operator pakiet lista <ID_Op>");
+        player.sendMessage(ChatColor.GRAY + "Przykład: /operator pakiet utworz phonifyus Podstawowy DOMESTIC 30 30 100 100 500");
+    }
+
+    private void sendPackageCreateHelp(Player player) {
+        player.sendMessage(ChatColor.RED + "Za mało argumentów.");
+        player.sendMessage(ChatColor.YELLOW + "/operator pakiet utworz <ID_Op> <nazwa> <typ> <cena> <dni> <min> <sms> <mb>");
+        player.sendMessage(ChatColor.GRAY + "Typ: DOMESTIC lub ROAMING | -1 = nielimitowane | 0 dni = bezterminowy");
+    }
+
+    // ==================== HELP ====================
+
     private void sendHelp(Player player) {
         player.sendMessage(ChatColor.GOLD + "=== Operator - Pomoc ===");
         player.sendMessage(ChatColor.YELLOW + "/operator utworz <ID> <Nazwa> " + ChatColor.WHITE + "- Tworzy nowego operatora");
@@ -308,6 +401,8 @@ public class OperatorCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.YELLOW + "/operator lista " + ChatColor.WHITE + "- Lista operatorów");
         player.sendMessage(ChatColor.YELLOW + "/operator stawka <ID> <typ> <cena> " + ChatColor.WHITE + "- Ustawia stawkę");
         player.sendMessage(ChatColor.YELLOW + "/operator pracownik <dodaj/usun> <gracz> " + ChatColor.WHITE + "- Zarządza pracownikami");
+        player.sendMessage(ChatColor.YELLOW + "/operator pakiet utworz <...> " + ChatColor.WHITE + "- Tworzy pakiet");
+        player.sendMessage(ChatColor.YELLOW + "/operator pakiety <ID> " + ChatColor.WHITE + "- Lista pakietów");
     }
 
     @Override
@@ -323,10 +418,19 @@ public class OperatorCommand implements CommandExecutor, TabCompleter {
             completions.add("lista");
             completions.add("stawka");
             completions.add("pracownik");
+            completions.add("pakiet");
+            completions.add("pakiety");
             if (sender.hasPermission("owntelecom.admin")) {
                 completions.add("admin");
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("info")) {
+            completions.addAll(plugin.getOperatorManager().getAllOperators().stream()
+                .map(Operator::getId)
+                .collect(Collectors.toList()));
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("pakiet")) {
+            completions.add("utworz");
+            completions.add("lista");
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("pakiety")) {
             completions.addAll(plugin.getOperatorManager().getAllOperators().stream()
                 .map(Operator::getId)
                 .collect(Collectors.toList()));
