@@ -30,70 +30,84 @@ public class StationManager {
         this.stations = new ConcurrentHashMap<>();
         this.operatorStations = new ConcurrentHashMap<>();
         this.stationsFile = new File(plugin.getDataFolder(), "stations.yml");
-        
+
         // Wczytaj konfigurację technologii
         this.technologiesFile = new File(plugin.getDataFolder(), "technologies.yml");
         if (!technologiesFile.exists()) {
             plugin.saveResource("technologies.yml", false);
         }
         this.technologiesConfig = YamlConfiguration.loadConfiguration(technologiesFile);
-        
+
         loadStations();
         startFailureCheckTask();
     }
 
+    // ========== DYNAMICZNE POBIERANIE PARAMETRÓW TECHNOLOGII ==========
+
+    /**
+     * Bazowy zasięg technologii w blokach
+     */
+    public double getTechnologyRange(String technology) {
+        return technologiesConfig.getDouble("technologies." + technology + ".zasieg_bazowy", 50.0);
+    }
+
+    /**
+     * Bazowa prędkość technologii w Mb/s
+     */
+    public double getTechnologySpeed(String technology) {
+        return technologiesConfig.getDouble("technologies." + technology + ".predkosc_mbs", 1.0);
+    }
+
+    /**
+     * Czy technologia obsługuje internet
+     */
+    public boolean isInternetSupported(String technology) {
+        return technologiesConfig.getBoolean("technologies." + technology + ".obsluguje_internet", false);
+    }
+
     // Tworzenie stacji
     public boolean createStation(Player player, String operatorId, String technology) {
-        // Sprawdź czy operator istnieje
         if (plugin.getOperatorManager().getOperator(operatorId) == null) {
             player.sendMessage("§cOperator o ID '" + operatorId + "' nie istnieje!");
             return false;
         }
 
-        // Sprawdź uprawnienia
-        if (!plugin.getOperatorManager().getOperator(operatorId).isOwner(player.getUniqueId()) 
-            && !player.hasPermission("owntelecom.admin")) {
+        if (!plugin.getOperatorManager().getOperator(operatorId).isOwner(player.getUniqueId())
+                && !player.hasPermission("owntelecom.admin")) {
             player.sendMessage("§cNie jesteś właścicielem tego operatora!");
             return false;
         }
 
-        // Sprawdź czy technologia istnieje
         if (!technologiesConfig.contains("technologies." + technology)) {
-            player.sendMessage("§cNieznana technologia! Dostępne: 2G, LTE, 5G");
+            player.sendMessage("§cNieznana technologia! Sprawdź technologie.yml.");
             return false;
         }
 
-        // Sprawdź czy gracz patrzy na odpowiedni blok
         Location targetLocation = player.getTargetBlock(null, 10).getLocation();
         Material requiredBlock = plugin.getConfigManager().getStationBlock();
-        
+
         if (targetLocation.getBlock().getType() != requiredBlock) {
             player.sendMessage("§cMusisz patrzeć na blok " + requiredBlock.name() + " aby postawić stację!");
             return false;
         }
 
-        // Sprawdź koszt budowy
         double cost = technologiesConfig.getDouble("technologies." + technology + ".cena_budowy", 1000.0);
         if (!plugin.getEconomy().has(player, cost)) {
             player.sendMessage("§cNie masz wystarczających środków! Potrzebujesz: $" + cost);
             return false;
         }
 
-        // Generuj ID stacji
         String stationId = operatorId + "_station_" + System.currentTimeMillis();
-        
-        // Pobierz pieniądze
         plugin.getEconomy().withdrawPlayer(player, cost);
-        
-        // Utwórz stację
-        Station station = new Station(stationId, operatorId, targetLocation, technology, player.getUniqueId());
+
+        // Przekazujemy this (StationManager) do stacji
+        Station station = new Station(stationId, operatorId, targetLocation, technology,
+                player.getUniqueId(), this);
         stations.put(stationId, station);
-        
-        // Dodaj do mapy operatora
         operatorStations.computeIfAbsent(operatorId, k -> new ArrayList<>()).add(station);
-        
+
         saveStations();
-        
+
         player.sendMessage("§aPostawiłeś stację §e" + technology + " §adla operatora §e" + operatorId);
         player.sendMessage("§aKoszt: §e$" + cost + " §a| Zasięg: §e" + station.getBaseRange() + " §abloków");
         return true;
@@ -107,9 +121,8 @@ public class StationManager {
             return false;
         }
 
-        // Sprawdź uprawnienia
         if (!plugin.getOperatorManager().getOperator(station.getOperatorId()).isOwner(player.getUniqueId())
-            && !player.hasPermission("owntelecom.admin")) {
+                && !player.hasPermission("owntelecom.admin")) {
             player.sendMessage("§cNie jesteś właścicielem tej stacji!");
             return false;
         }
@@ -128,7 +141,7 @@ public class StationManager {
         plugin.getEconomy().withdrawPlayer(player, cost);
         station.setLevel(station.getLevel() + 1);
         saveStations();
-        
+
         player.sendMessage("§aUlepszono stację do poziomu §e" + station.getLevel());
         player.sendMessage("§aNowy zasięg: §e" + station.getBaseRange() + " §abloków");
         player.sendMessage("§aSzansa na awarię: §e" + station.getDamageChance() + "%");
@@ -158,7 +171,7 @@ public class StationManager {
         station.setBroken(false);
         station.setActive(true);
         saveStations();
-        
+
         player.sendMessage("§aNaprawiono stację! Koszt: §e$" + cost);
         return true;
     }
@@ -172,7 +185,7 @@ public class StationManager {
         }
 
         if (!plugin.getOperatorManager().getOperator(station.getOperatorId()).isOwner(player.getUniqueId())
-            && !player.hasPermission("owntelecom.admin")) {
+                && !player.hasPermission("owntelecom.admin")) {
             player.sendMessage("§cNie jesteś właścicielem tej stacji!");
             return false;
         }
@@ -182,7 +195,7 @@ public class StationManager {
         if (opStations != null) {
             opStations.remove(station);
         }
-        
+
         saveStations();
         player.sendMessage("§aUsunięto stację §e" + stationId);
         return true;
@@ -198,7 +211,7 @@ public class StationManager {
 
         for (Station station : opStations) {
             if (!station.isActive() || station.isBroken()) continue;
-            
+
             double quality = station.getSignalQuality(player.getLocation());
             if (quality > bestQuality) {
                 bestQuality = quality;
@@ -219,11 +232,11 @@ public class StationManager {
 
         for (Station station : opStations) {
             if (!station.isActive() || station.isBroken()) continue;
-            if (!supportsInternet(station.getTechnology())) continue;
-            
+            if (!station.supportsInternet()) continue;
+
             double distance = station.getLocation().distance(player.getLocation());
             double speed = station.getSpeedAtDistance(distance);
-            
+
             if (speed > bestSpeed) {
                 bestSpeed = speed;
                 bestStation = station;
@@ -238,16 +251,16 @@ public class StationManager {
         return findBestStation(player, operatorId) != null;
     }
 
-    // Sprawdź czy technologia obsługuje internet
+    // Sprawdź czy technologia obsługuje internet (kompatybilność)
     public boolean supportsInternet(String technology) {
-        return technologiesConfig.getBoolean("technologies." + technology + ".obsluguje_internet", false);
+        return isInternetSupported(technology);
     }
 
     // Pobierz prędkość internetu dla gracza
     public double getPlayerInternetSpeed(Player player, String operatorId) {
         Station station = findBestInternetStation(player, operatorId);
         if (station == null) return 0.0;
-        
+
         double distance = station.getLocation().distance(player.getLocation());
         return station.getSpeedAtDistance(distance);
     }
@@ -268,19 +281,17 @@ public class StationManager {
 
         for (Station station : stations.values()) {
             if (!station.isActive() || station.isBroken()) continue;
-            
+
             double chance = station.getDamageChance();
             if (random.nextDouble() * 100 < chance) {
                 station.setBroken(true);
                 station.setActive(false);
                 brokenCount++;
-                
-                // Powiadom właściciela
-                plugin.getOperatorManager().getOperator(station.getOperatorId()).getOwner();
+
                 Player owner = Bukkit.getPlayer(station.getCreatedBy());
                 if (owner != null && owner.isOnline()) {
-                    owner.sendMessage("§c⚠ Twoja stacja §e" + station.getId() + " §c(Technologia: " + 
-                        station.getTechnology() + ") uległa awarii! Koszt naprawy: $" + station.getRepairCost());
+                    owner.sendMessage("§c⚠ Twoja stacja §e" + station.getId() + " §c(Technologia: " +
+                            station.getTechnology() + ") uległa awarii! Koszt naprawy: $" + station.getRepairCost());
                 }
             }
         }
@@ -311,7 +322,7 @@ public class StationManager {
     // Zapis i odczyt
     public void saveStations() {
         FileConfiguration config = new YamlConfiguration();
-        
+
         for (Station station : stations.values()) {
             String path = "stations." + station.getId();
             config.set(path + ".operatorId", station.getOperatorId());
@@ -323,7 +334,7 @@ public class StationManager {
             config.set(path + ".createdBy", station.getCreatedBy().toString());
             config.set(path + ".creationDate", station.getCreationDate());
         }
-        
+
         try {
             config.save(stationsFile);
         } catch (IOException e) {
@@ -347,30 +358,30 @@ public class StationManager {
 
         FileConfiguration config = YamlConfiguration.loadConfiguration(stationsFile);
         ConfigurationSection stationsSection = config.getConfigurationSection("stations");
-        
+
         if (stationsSection == null) return;
 
         for (String id : stationsSection.getKeys(false)) {
             String path = "stations." + id;
-            
+
             String operatorId = config.getString(path + ".operatorId");
             String locationStr = config.getString(path + ".location");
             Location location = Station.stringToLocation(locationStr);
-            
+
             if (location == null) continue;
-            
+
             String technology = config.getString(path + ".technology", "LTE");
             UUID createdBy = UUID.fromString(config.getString(path + ".createdBy"));
-            
-            Station station = new Station(id, operatorId, location, technology, createdBy);
+
+            Station station = new Station(id, operatorId, location, technology, createdBy, this);
             station.setLevel(config.getInt(path + ".level", 1));
             station.setActive(config.getBoolean(path + ".active", true));
             station.setBroken(config.getBoolean(path + ".broken", false));
-            
+
             stations.put(id, station);
             operatorStations.computeIfAbsent(operatorId, k -> new ArrayList<>()).add(station);
         }
-        
+
         plugin.getLogger().info("Załadowano " + stations.size() + " stacji bazowych.");
     }
 
